@@ -13,52 +13,65 @@ func main() {
 }
 
 func run(part2 bool, input string) any {
+	var lines = strings.Split(strings.TrimSpace(input), "\n")
+
+	var lists [2][]int
+
+	for _, line := range lines {
+		parts := strings.Fields(line)
+
+		val_one, err := strconv.Atoi(parts[0])
+		if err != nil {
+			panic(err)
+		}
+
+		val_two, err := strconv.Atoi(parts[1])
+		if err != nil {
+			panic(err)
+		}
+
+		lists[0] = append(lists[0], val_one)
+		lists[1] = append(lists[1], val_two)
+	}
+
 	if part2 {
-		return "not implemented"
+		occurences := make(map[int]int)
+
+		sum := 0
+
+		for _, id := range lists[0] {
+			if count, exists := occurences[id]; exists {
+				sum += id * count
+				continue
+			}
+
+			for _, item_a := range lists[1] {
+				if id == item_a {
+					occurences[id]++
+				}
+			}
+
+			sum += id * occurences[id]
+		}
+
+		return sum
 	}
 
-	var res = strings.Split(input, "\n")
-
-	var list_one []int
-	var list_two []int
-
-	for _, v := range res {
-		var r = strings.Split(v, "   ")
-
-		if len(r) < 2 {
-			continue
-		}
-
-		i_o, err := strconv.Atoi(r[0])
-		if err != nil {
-			panic(err)
-		}
-
-		i_t, err := strconv.Atoi(r[1])
-		if err != nil {
-			panic(err)
-		}
-
-		list_one = append(list_one, i_o)
-		list_two = append(list_two, i_t)
-	}
-
-	sort.Slice(list_one, func(i, j int) bool {
-		return list_one[i] < list_one[j]
-	})
-
-	sort.Slice(list_two, func(i, j int) bool {
-		return list_two[i] < list_two[j]
-	})
+	sort.Ints(lists[0])
+	sort.Ints(lists[1])
 
 	var sum = 0
-	for i := 0; i < len(list_one); i++ {
-		if list_two[i] < list_one[i] {
-			sum += list_one[i] - list_two[i]
-		} else {
-			sum += list_two[i] - list_one[i]
-		}
+	for i := 0; i < len(lists[0]); i++ {
+		sum += abs(lists[0][i] - lists[1][i])
 	}
 
 	return sum
+}
+
+func abs(num int) int {
+	if num < 0 {
+		return -num
+	}
+
+	return num
 }
