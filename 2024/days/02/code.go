@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -12,51 +13,68 @@ func main() {
 }
 
 func run(part2 bool, input string) any {
-	if part2 {
-		return "not implemented"
-	}
-
-	lines := strings.Split(strings.TrimSpace(input), "\n")
-
 	sum := 0
 
-	for _, line := range lines {
-		data, err := string_arr_to_int(strings.Split(line, " "))
-		if err != nil {
-			panic(err)
+	for _, line := range strings.Split(strings.TrimSpace(input), "\n") {
+		report := string_arr_to_int(strings.Split(line, " "))
+
+		safe := is_safe(report)
+		if safe {
+			sum++
+			continue
 		}
 
-		prev := data[0]
-		increasing := data[0] < data[1]
-		for i := 1; i < len(data); i++ {
-			val := data[i]
+		if part2 {
+			for i := 0; i < len(report); i++ { // RAAHHHHH BRUTE FORCE
+				fixed_report := slices.Delete(slices.Clone(report), i, i+1)
 
-			if increasing != (prev < val) || prev-val == 0 || abs(prev-val) > 3 {
-				break
+				if res := is_safe(fixed_report); res {
+					sum++
+					break
+				}
 			}
-
-			if i == len(data)-1 {
-				sum++
-			}
-
-			prev = val
 		}
 	}
 	return sum
 }
 
-func string_arr_to_int(arr []string) ([]int, error) {
+func is_safe(report []int) bool {
+	prev := report[0]
+	decrease, increase := false, false
+
+	for i := 1; i < len(report); i++ {
+		val := report[i]
+
+		if prev < val {
+			increase = true
+		} else if prev > val {
+			decrease = true
+		} else {
+			return false
+		}
+
+		if abs(prev-val) > 3 || (decrease && increase) {
+			return false
+		}
+
+		prev = val
+	}
+
+	return true
+}
+
+func string_arr_to_int(arr []string) []int {
 	var res []int
 	for _, val := range arr {
 		v, err := strconv.Atoi(val)
 		if err != nil {
-			return res, err
+			panic(err)
 		}
 
 		res = append(res, v)
 	}
 
-	return res, nil
+	return res
 }
 
 func abs(num int) int {
