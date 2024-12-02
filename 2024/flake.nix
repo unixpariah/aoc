@@ -20,6 +20,9 @@
             go
             gopls
           ];
+          # shellHook = ''
+          #   export AOC_SESSION="${builtins.readFile }"
+          # '';
         };
       });
     };

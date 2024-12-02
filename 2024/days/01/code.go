@@ -13,7 +13,7 @@ func main() {
 }
 
 func run(part2 bool, input string) any {
-	var lines = strings.Split(strings.TrimSpace(input), "\n")
+	lines := strings.Split(strings.TrimSpace(input), "\n")
 
 	var lists [2][]int
 
@@ -60,7 +60,7 @@ func run(part2 bool, input string) any {
 	sort.Ints(lists[0])
 	sort.Ints(lists[1])
 
-	var sum = 0
+	sum := 0
 	for i := 0; i < len(lists[0]); i++ {
 		sum += abs(lists[0][i] - lists[1][i])
 	}
