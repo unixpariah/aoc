@@ -12,13 +12,23 @@ func main() {
 }
 
 func run(part2 bool, input string) any {
-	if part2 {
-		return "not implemented"
-	}
-
 	sum := 0
 	i := 0
 	for i < len(input) {
+		if part2 {
+			dont := strings.Index(input[i:], "don't()")
+			beggining := strings.Index(input[i:], "mul(")
+
+			if dont < beggining && dont != -1 && beggining != -1 {
+				do := strings.Index(input[i:], "do()")
+				if do == -1 {
+					break
+				}
+
+				i += do
+			}
+		}
+
 		beggining := strings.Index(input[i:], "mul(")
 		if beggining == -1 {
 			break
