@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -12,36 +13,42 @@ func main() {
 }
 
 type Pair struct {
-	X int
-	Y int
+	X string
+	Y string
 }
 
 func run(part2 bool, input string) any {
-	if part2 {
-		return "not implemented"
-	}
-
 	split := strings.Split(strings.TrimSpace(input), "\n\n")
 	hashSet := make(map[Pair]struct{})
 	sum := 0
 
+	cmp := func(a, b string) int {
+		if _, exists := hashSet[Pair{X: a, Y: b}]; exists {
+			return -1
+		}
+
+		return 0
+	}
+
 	for _, line := range strings.Split(split[0], "\n") {
 		values := strings.Split(line, "|")
-		key, err1 := strconv.Atoi(values[0])
-		value, err2 := strconv.Atoi(values[1])
-		if err1 == nil && err2 == nil {
-			hashSet[Pair{X: key, Y: value}] = struct{}{}
-		}
+
+		hashSet[Pair{X: values[0], Y: values[1]}] = struct{}{}
 	}
 
 	for _, line := range strings.Split(split[1], "\n") {
 		numbers := strings.Split(line, ",")
-		if isUpdateCorrect(&hashSet, numbers) {
-			midIndex := len(numbers) / 2
-			midValue, err := strconv.Atoi(numbers[midIndex])
-			if err == nil {
-				sum += midValue
-			}
+
+		correct := slices.IsSortedFunc(numbers, cmp)
+
+		midValue, _ := strconv.Atoi(numbers[len(numbers)/2])
+
+		if correct && !part2 {
+			sum += midValue
+		} else if !correct && part2 {
+			slices.SortFunc(numbers, cmp)
+
+			sum += midValue
 		}
 	}
 
@@ -49,17 +56,16 @@ func run(part2 bool, input string) any {
 }
 
 func isUpdateCorrect(hashSet *map[Pair]struct{}, numbers []string) bool {
+	set := *hashSet
+
 	for i, outer := range numbers {
 		for j, inner := range numbers {
 			if j <= i {
 				continue
 			}
-			valOuter, err1 := strconv.Atoi(outer)
-			valInner, err2 := strconv.Atoi(inner)
-			if err1 == nil && err2 == nil {
-				if _, exists := (*hashSet)[Pair{X: valInner, Y: valOuter}]; exists {
-					return false
-				}
+
+			if _, exists := set[Pair{X: inner, Y: outer}]; exists {
+				return false
 			}
 		}
 	}
