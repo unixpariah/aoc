@@ -12,10 +12,6 @@ func main() {
 }
 
 func run(part2 bool, input string) any {
-	if part2 {
-		return "not implemented"
-	}
-
 	grid := map[image.Point]rune{}
 	for row, line := range strings.Split(strings.TrimSpace(input), "\n") {
 		for col, char := range line {
@@ -47,7 +43,11 @@ func run(part2 bool, input string) any {
 
 	sum := 0
 	for point := range grid {
-		sum += strings.Count(strings.Join(findSequences(point, 4), " "), "XMAS")
+		if part2 {
+			sum += strings.Count("AMAMASASAMAMAS", strings.Join(findSequences(point, 2)[4:], ""))
+		} else {
+			sum += strings.Count(strings.Join(findSequences(point, 4), " "), "XMAS")
+		}
 	}
 
 	return sum
